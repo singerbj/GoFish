@@ -1,0 +1,34 @@
+[
+    {
+        "title": "user",
+        "attributes": {
+            "name": "string",
+            "gender": "string",
+            "age": "integer",
+            "description": "string"
+        }
+    },
+    {
+        "title": "match",
+        "attributes": {
+            "first_user_id": "integer",
+            "second_user_id": "integer"
+        }
+    },
+    {
+        "title": "feeling",
+        "attributes": {
+            "user_id": "integer",
+            "felt_user_id": "integer",
+            "feeling": "string"
+        }
+    },
+    {
+        "title": "message",
+        "attributes": {
+            "match_id": "integer",
+            "user_id": "integer",
+            "contents": "string"
+        }
+    }
+]
