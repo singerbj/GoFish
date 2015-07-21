@@ -122,7 +122,12 @@ end
 
 get '/matches/:id/?' do |id|
  	if id
- 	 	Match.find(id).to_json
+ 	 	match = Match.find(id) #.to_json
+
+        #the following may not work
+        match.first_user = User.find(match.first_user_id)
+        match.second_user = User.find(match.second_user_id)
+        match.to_json
  	else
  	    "Error: ID not specified."
  	end
@@ -170,7 +175,11 @@ end
 
 get '/feelings/:id/?' do |id|
  	if id
- 	 	Feeling.find(id).to_json
+ 	 	feeling = Feeling.find(id) #.to_json
+
+        #the following may not work
+        feeling.felt_user = User.find(feeling.felt_user_id)
+        feeling.to_json
  	else
  	    "Error: ID not specified."
  	end
@@ -218,7 +227,12 @@ end
 
 get '/messages/:id/?' do |id|
  	if id
- 	 	Message.find(id).to_json
+ 	 	message = Message.find(id) #.to_json
+
+        #the following may not work
+        message.match = Match.find(message.match_id)
+        message.user = Match.find(message.user_id)
+        message.to_json
  	else
  	    "Error: ID not specified."
  	end
