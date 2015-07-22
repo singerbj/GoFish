@@ -3,6 +3,8 @@ require 'json'
 require 'active_record'
 require 'sqlite3'
 
+Dir[File.dirname(__FILE__) + '/routes/*.rb'].each {|file| require file }
+
 ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: 'dbfile.sqlite3')
 
 class User < ActiveRecord::Base
@@ -13,6 +15,7 @@ class Feeling < ActiveRecord::Base
 end
 class Message < ActiveRecord::Base
 end
+
 if !ActiveRecord::Base.connection.table_exists? 'users'
     ActiveRecord::Migration.class_eval do
         create_table :users do |t|
@@ -50,226 +53,25 @@ if !ActiveRecord::Base.connection.table_exists? 'messages'
     end
 end
 configure do
-  set :bind, '0.0.0.0'
-  set :public_folder, '.'
+    set :bind, '0.0.0.0'
+    set :public_folder, '.'
 end
 
 after { ActiveRecord::Base.connection.close }
 
 not_found do
-  request.path
+    request.path
 end
 
 error do
-  "Error is: " + params['captures'].first.inspect
+    "Error is: " + params['captures'].first.inspect
 end
 
 get "/" do
-	"Hello World!"
+    "Hello World!"
 end
 
-get '/users/?' do
-	User.all.to_json
-end
-
-get '/users/:id/?' do |id|
- 	if id
- 	 	User.find(id).to_json
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-post '/users/?' do
-	request.body.rewind
-	j = JSON.parse(request.body.read)
-	o = User.new
-	j.each do |key, value|
-		o[key] = value
-	end
-	o.save!
-	o.to_json
-end
-
-put '/users/:id/?' do |id|
-   if id
-		request.body.rewind
-		j = JSON.parse(request.body.read)
-		o = User.find(id)
-		j.each do |key, value|
-			o[key] = value
-		end
-		o.save!
-		o.to_json
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-delete '/users/:id/?' do |id|
-   if id
-      o = User.find(id)
-      o.destroy!
-      id
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-get '/matches/?' do
-	Match.all.to_json
-end
-
-get '/matches/:id/?' do |id|
- 	if id
- 	 	match = Match.find(id) #.to_json
-
-        #the following may not work
-        match.first_user = User.find(match.first_user_id)
-        match.second_user = User.find(match.second_user_id)
-        match.to_json
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-post '/matches/?' do
-	request.body.rewind
-	j = JSON.parse(request.body.read)
-	o = Match.new
-	j.each do |key, value|
-		o[key] = value
-	end
-	o.save!
-	o.to_json
-end
-
-put '/matches/:id/?' do |id|
-   if id
-		request.body.rewind
-		j = JSON.parse(request.body.read)
-		o = Match.find(id)
-		j.each do |key, value|
-			o[key] = value
-		end
-		o.save!
-		o.to_json
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-delete '/matches/:id/?' do |id|
-   if id
-      o = Match.find(id)
-      o.destroy!
-      id
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-get '/feelings/?' do
-	Feeling.all.to_json
-end
-
-get '/feelings/:id/?' do |id|
- 	if id
- 	 	feeling = Feeling.find(id) #.to_json
-
-        #the following may not work
-        feeling.felt_user = User.find(feeling.felt_user_id)
-        feeling.to_json
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-post '/feelings/?' do
-	request.body.rewind
-	j = JSON.parse(request.body.read)
-	o = Feeling.new
-	j.each do |key, value|
-		o[key] = value
-	end
-	o.save!
-	o.to_json
-end
-
-put '/feelings/:id/?' do |id|
-   if id
-		request.body.rewind
-		j = JSON.parse(request.body.read)
-		o = Feeling.find(id)
-		j.each do |key, value|
-			o[key] = value
-		end
-		o.save!
-		o.to_json
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-delete '/feelings/:id/?' do |id|
-   if id
-      o = Feeling.find(id)
-      o.destroy!
-      id
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-get '/messages/?' do
-	Message.all.to_json
-end
-
-get '/messages/:id/?' do |id|
- 	if id
- 	 	message = Message.find(id) #.to_json
-
-        #the following may not work
-        message.match = Match.find(message.match_id)
-        message.user = Match.find(message.user_id)
-        message.to_json
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-post '/messages/?' do
-	request.body.rewind
-	j = JSON.parse(request.body.read)
-	o = Message.new
-	j.each do |key, value|
-		o[key] = value
-	end
-	o.save!
-	o.to_json
-end
-
-put '/messages/:id/?' do |id|
-   if id
-		request.body.rewind
-		j = JSON.parse(request.body.read)
-		o = Message.find(id)
-		j.each do |key, value|
-			o[key] = value
-		end
-		o.save!
-		o.to_json
- 	else
- 	    "Error: ID not specified."
- 	end
-end
-
-delete '/messages/:id/?' do |id|
-   if id
-      o = Message.find(id)
-      o.destroy!
-      id
- 	else
- 	    "Error: ID not specified."
- 	end
-end
+register Sinatra::SampleApp::Routes::User
+register Sinatra::SampleApp::Routes::Match
+register Sinatra::SampleApp::Routes::Feeling
+register Sinatra::SampleApp::Routes::Message
