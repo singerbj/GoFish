@@ -2,59 +2,23 @@ require 'sinatra'
 require 'json'
 require 'active_record'
 require 'sqlite3'
-
-Dir[File.dirname(__FILE__) + '/routes/*.rb'].each {|file| require file }
+require 'date'
 
 ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: 'dbfile.sqlite3')
 
-class User < ActiveRecord::Base
-end
-class Match < ActiveRecord::Base
-end
-class Feeling < ActiveRecord::Base
-end
-class Message < ActiveRecord::Base
-end
+#Include Models
+require_relative 'models/Match'
+require_relative 'models/Feeling'
+require_relative 'models/Message'
+require_relative 'models/User'
 
-if !ActiveRecord::Base.connection.table_exists? 'users'
-    ActiveRecord::Migration.class_eval do
-        create_table :users do |t|
-        t.string :name
-        t.string :gender
-        t.integer :age
-        t.string :description
-        end
-    end
-end
-if !ActiveRecord::Base.connection.table_exists? 'matches'
-    ActiveRecord::Migration.class_eval do
-        create_table :matches do |t|
-        t.integer :first_user_id
-        t.integer :second_user_id
-        end
-    end
-end
-if !ActiveRecord::Base.connection.table_exists? 'feelings'
-    ActiveRecord::Migration.class_eval do
-        create_table :feelings do |t|
-        t.integer :user_id
-        t.integer :felt_user_id
-        t.string :feeling
-        end
-    end
-end
-if !ActiveRecord::Base.connection.table_exists? 'messages'
-    ActiveRecord::Migration.class_eval do
-        create_table :messages do |t|
-        t.integer :match_id
-        t.integer :user_id
-        t.string :contents
-        end
-    end
-end
+#Include DB Stuff
+require_relative 'db/init'
+
+#Generic Sinatra stuff
 configure do
-    set :bind, '0.0.0.0'
-    set :public_folder, '.'
+set :bind, '0.0.0.0'
+set :public_folder, '.'
 end
 
 after { ActiveRecord::Base.connection.close }
@@ -71,7 +35,8 @@ get "/" do
     "Hello World!"
 end
 
-register Sinatra::SampleApp::Routes::User
-register Sinatra::SampleApp::Routes::Match
-register Sinatra::SampleApp::Routes::Feeling
-register Sinatra::SampleApp::Routes::Message
+#Include other routes
+require_relative 'routes/match_routes'
+require_relative 'routes/feeling_routes'
+require_relative 'routes/message_routes'
+require_relative 'routes/user_routes'
