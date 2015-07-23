@@ -1,0 +1,37 @@
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
+.prof-pic {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    margin: 15px;
+    background-color: #eee;
+    background-size: 100px 100px;
+}
+
+#navbar {
+    color: white;
+    padding: 15px;
+    background: #5bc0de;
+}
+
+#title {
+    font-weight: normal;
+    margin: 0px;
+}
+
+.center-container {
+    width: 100%;
+    text-align: center;
+}
+
+.current-user-info {
+    margin: 20px;
+    text-align: right;
+}
+
+textarea {
+    resize: none;
+}

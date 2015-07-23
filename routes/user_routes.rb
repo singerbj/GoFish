@@ -1,7 +1,3 @@
-get '/users/?' do
-	User.all.to_json
-end
-
 get '/users/:id/?' do |id|
  	if id
  	 	User.find(id).to_json
@@ -18,30 +14,29 @@ get '/users/:id/matches/?' do |id|
  	end
 end
 
-post '/users/?' do
-	request.body.rewind
-	j = JSON.parse(request.body.read)
-	o = User.new
-	j.each do |key, value|
-		o[key] = value
-	end
-	o.save!
-	o.to_json
-end
-
 put '/users/:id/?' do |id|
-    if id
-		request.body.rewind
-		j = JSON.parse(request.body.read)
-		o = User.find(id)
-		j.each do |key, value|
-			o[key] = value
-		end
-		o.save!
-		o.to_json
- 	else
- 	    "Error: ID not specified."
- 	end
+	begin
+	    if id
+			o = User.find(id)
+			if o.fb_id == session[:current_user_id]
+				request.body.rewind
+				j = JSON.parse(request.body.read)
+				o = User.find(id)
+				j.each do |key, value|
+					o[key] = value
+				end
+				o.save!
+				session[:current_user] = User.where(fb_id: session[:current_user_id].to_s).to_json
+				o.to_json
+			else
+				"You cannot edit other people's information."
+			end
+	 	else
+	 	    "Error: ID not specified."
+	 	end
+	rescue Exception => e
+		"{ \"error\": \"#{ e.message }\" }"
+	end
 end
 
 delete '/users/:id/?' do |id|
@@ -53,3 +48,18 @@ delete '/users/:id/?' do |id|
  	    "Error: ID not specified."
  	end
 end
+
+# get '/users/?' do
+# 	User.all.to_json
+# end
+#
+# post '/users/?' do
+# 	request.body.rewind
+# 	j = JSON.parse(request.body.read)
+# 	o = User.new
+# 	j.each do |key, value|
+# 		o[key] = value
+# 	end
+# 	o.save!
+# 	o.to_json
+# end
