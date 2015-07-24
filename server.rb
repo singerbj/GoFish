@@ -19,6 +19,7 @@ require_relative 'models/User'
 
 #Include DB Stuff
 require_relative 'db/init'
+require_relative 'seed'
 
 #Generic Sinatra stuff
 configure do
@@ -82,7 +83,6 @@ get '/auth/:provider/callback' do
         u.lat = JSON.parse(loc_response.body.to_s)['latitude']
         u.long = JSON.parse(loc_response.body.to_s)['longitude']
         u.save!
-        puts u.inspect
 
         session[:authenticated] = true
         session[:current_user_id] = r['extra']['raw_info']['id']

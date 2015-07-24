@@ -20,13 +20,13 @@ if !ActiveRecord::Base.connection.table_exists? 'matches'
             t.integer :first_user_id, :null => false
             t.integer :second_user_id, :null => false
             t.datetime :time, :null => false
+            t.string :matched_user
         end
     end
 end
 if !ActiveRecord::Base.connection.table_exists? 'feelings'
     ActiveRecord::Migration.class_eval do
         create_table :feelings do |t|
-            t.integer :owner_id, :null => false
             t.integer :user_id, :null => false
             t.integer :felt_user_id, :null => false
             t.string :feeling, :null => false

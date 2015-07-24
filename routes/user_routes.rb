@@ -6,12 +6,29 @@ get '/users/:id/?' do |id|
  	end
 end
 
-get '/users/:id/matches/?' do |id|
- 	if id
- 	 	Match.where(first_user_id: id).concat(Match.where(second_user_id: id))
- 	else
- 	    "Error: ID not specified."
- 	end
+get '/my_matches/?' do
+    current_user = User.where(fb_id: session[:current_user_id])[0]
+    matches = Match.where(first_user_id: current_user['id']).concat(Match.where(second_user_id: current_user['id']))
+    matches.each do |match|
+        # if !match.matched_user
+            if match.first_user_id != current_user.id
+                match.matched_user = User.where(id: match.first_user_id)[0].to_json
+            else
+                match.matched_user = User.where(id: match.second_user_id)[0].to_json
+            end
+            # match.save!
+        # end
+    end
+    matches.to_json
+end
+
+get '/random_user/?' do
+	# request.body.rewind
+	# j = JSON.parse(request.body.read)
+	current_user = User.where(fb_id: session[:current_user_id])[0]
+	gender_to_use = current_user['gender'] == "male" ? "female" : "male"
+	u = User.where(gender: gender_to_use).shuffle[0]
+	u.to_json
 end
 
 put '/users/:id/?' do |id|
@@ -26,7 +43,6 @@ put '/users/:id/?' do |id|
 					o[key] = value
 				end
 				o.save!
-				session[:current_user] = User.where(fb_id: session[:current_user_id].to_s).to_json
 				o.to_json
 			else
 				"You cannot edit other people's information."

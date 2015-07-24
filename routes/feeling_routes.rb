@@ -1,23 +1,37 @@
-post '/feelings/?' do
-	request.body.rewind
-	j = JSON.parse(request.body.read)
-	o = Feeling.new
-	j.each do |key, value|
-		o[key] = value
+post '/feelings/:id/:feeling/?' do |id, feeling_str|
+	current_user = User.where(fb_id: session[:current_user_id])[0]
+	f = Feeling.where(user_id: current_user['id'], felt_user_id: id)
+	puts "**********************#{f.inspect}, #{f.length}"
+	if f.length == 0
+		feeling = Feeling.new
+		feeling.user_id = current_user.id
+		feeling.felt_user_id = id
+		feeling.feeling = feeling_str
+		feeling.save!
+	else
+		feeling = f
 	end
-	o.save!
-	o.to_json
 
-	if o.
-		f = Feeling.where(user_id: o.owner_id, owner_id: o.user_id)
-
-		if f
+	if feeling_str == "like" && Feeling.where(user_id: id, felt_user_id: current_user['id'], feeling: "like").length > 0
+		if !(Match.where(first_user_id: current_user['id'], second_user_id: id).length > 0) && !(Match.where(first_user_id: id, second_user_id: current_user['id']).length > 0)
 			m = Match.new
-			m.first_user_id = o.owner_id
-			m.second_user_id = o.user_id
+			m.first_user_id = current_user['id']
+			m.second_user_id = id
 			m.time = DateTime.new
+			m.save!
+		end
+	elsif feeling_str == "dislike"
+		m1 = Match.where(first_user_id: current_user['id'], second_user_id: id)
+		m2 = Match.where(first_user_id: id, second_user_id: current_user['id'])
+		match = m1.length > 0 ? m1[0] : (m2.length > 0 ? m2[0] : nil)
+		if match
+			match.destroy!
 		end
 	end
+
+
+	puts "**********************#{Feeling.all.length}"
+	puts "**********************#{Match.all.length}"
 end
 
 
